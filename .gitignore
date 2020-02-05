@@ -1,0 +1,11 @@
+.vs/
+*.suo
+*.ide
+app.exe
+*.pdb
+*.cache
+*.dll
+*.xml
+*.config
+!packages.config
+!app.config

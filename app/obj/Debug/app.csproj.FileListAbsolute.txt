@@ -1,0 +1,81 @@
+C:/Users/vinicius/source/repos/app/app/bin/Debug/app.exe.config
+C:/Users/vinicius/source/repos/app/app/bin/Debug/app.exe
+C:/Users/vinicius/source/repos/app/app/bin/Debug/app.pdb
+C:/Users/vinicius/source/repos/app/app/bin/Debug/WebDriver.dll
+C:/Users/vinicius/source/repos/app/app/bin/Debug/WebDriver.xml
+C:/Users/vinicius/source/repos/app/app/obj/Debug/app.FormAddPlaylists.resources
+C:/Users/vinicius/source/repos/app/app/obj/Debug/app.FormMain.resources
+C:/Users/vinicius/source/repos/app/app/obj/Debug/app.Properties.Resources.resources
+C:/Users/vinicius/source/repos/app/app/obj/Debug/app.csproj.GenerateResource.cache
+C:/Users/vinicius/source/repos/app/app/obj/Debug/app.csproj.CoreCompileInputs.cache
+C:/Users/vinicius/source/repos/app/app/obj/Debug/app.csproj.CopyComplete
+C:/Users/vinicius/source/repos/app/app/obj/Debug/app.exe
+C:/Users/vinicius/source/repos/app/app/obj/Debug/app.pdb
+C:/Users/vinicius/source/repos/app/app/obj/Debug/app.csprojAssemblyReference.cache
+/media/vinicius/HD/Dados/Projects/SpotifyPlaylist - Windows Forms/app/bin/Debug/app.exe.config
+/media/vinicius/HD/Dados/Projects/SpotifyPlaylist - Windows Forms/app/bin/Debug/app.exe
+/media/vinicius/HD/Dados/Projects/SpotifyPlaylist - Windows Forms/app/bin/Debug/app.pdb
+/media/vinicius/HD/Dados/Projects/SpotifyPlaylist - Windows Forms/app/bin/Debug/WebDriver.dll
+/media/vinicius/HD/Dados/Projects/SpotifyPlaylist - Windows Forms/app/bin/Debug/WebDriver.xml
+/media/vinicius/HD/Dados/Projects/SpotifyPlaylist - Windows Forms/app/obj/Debug/app.csprojAssemblyReference.cache
+/media/vinicius/HD/Dados/Projects/SpotifyPlaylist - Windows Forms/app/obj/Debug/app.FormAddPlaylists.resources
+/media/vinicius/HD/Dados/Projects/SpotifyPlaylist - Windows Forms/app/obj/Debug/app.FormMain.resources
+/media/vinicius/HD/Dados/Projects/SpotifyPlaylist - Windows Forms/app/obj/Debug/app.Properties.Resources.resources
+/media/vinicius/HD/Dados/Projects/SpotifyPlaylist - Windows Forms/app/obj/Debug/app.csproj.GenerateResource.cache
+/media/vinicius/HD/Dados/Projects/SpotifyPlaylist - Windows Forms/app/obj/Debug/app.csproj.CoreCompileInputs.cache
+/media/vinicius/HD/Dados/Projects/SpotifyPlaylist - Windows Forms/app/obj/Debug/app.csproj.CopyComplete
+/media/vinicius/HD/Dados/Projects/SpotifyPlaylist - Windows Forms/app/obj/Debug/app.exe
+/media/vinicius/HD/Dados/Projects/SpotifyPlaylist - Windows Forms/app/obj/Debug/app.pdb
+D:\Dados\Projects\SpotifyPlaylist - Windows Forms\app\bin\Debug\app.exe.config
+D:\Dados\Projects\SpotifyPlaylist - Windows Forms\app\bin\Debug\app.exe
+D:\Dados\Projects\SpotifyPlaylist - Windows Forms\app\bin\Debug\app.pdb
+D:\Dados\Projects\SpotifyPlaylist - Windows Forms\app\bin\Debug\WebDriver.dll
+D:\Dados\Projects\SpotifyPlaylist - Windows Forms\app\bin\Debug\WebDriver.xml
+D:\Dados\Projects\SpotifyPlaylist - Windows Forms\app\obj\Debug\app.csprojAssemblyReference.cache
+D:\Dados\Projects\SpotifyPlaylist - Windows Forms\app\obj\Debug\app.FormAddPlaylists.resources
+D:\Dados\Projects\SpotifyPlaylist - Windows Forms\app\obj\Debug\app.FormMain.resources
+D:\Dados\Projects\SpotifyPlaylist - Windows Forms\app\obj\Debug\app.Properties.Resources.resources
+D:\Dados\Projects\SpotifyPlaylist - Windows Forms\app\obj\Debug\app.csproj.GenerateResource.cache
+D:\Dados\Projects\SpotifyPlaylist - Windows Forms\app\obj\Debug\app.csproj.CoreCompileInputs.cache
+D:\Dados\Projects\SpotifyPlaylist - Windows Forms\app\obj\Debug\app.csproj.CopyComplete
+D:\Dados\Projects\SpotifyPlaylist - Windows Forms\app\obj\Debug\app.exe
+D:\Dados\Projects\SpotifyPlaylist - Windows Forms\app\obj\Debug\app.pdb
+C:\project\SpotifyPlaylist\app\bin\Debug\app.exe.config
+C:\project\SpotifyPlaylist\app\bin\Debug\app.exe
+C:\project\SpotifyPlaylist\app\bin\Debug\app.pdb
+C:\project\SpotifyPlaylist\app\bin\Debug\WebDriver.dll
+C:\project\SpotifyPlaylist\app\bin\Debug\WebDriver.xml
+C:\project\SpotifyPlaylist\app\obj\Debug\app.FormAddPlaylists.resources
+C:\project\SpotifyPlaylist\app\obj\Debug\app.FormMain.resources
+C:\project\SpotifyPlaylist\app\obj\Debug\app.Properties.Resources.resources
+C:\project\SpotifyPlaylist\app\obj\Debug\app.csproj.GenerateResource.cache
+C:\project\SpotifyPlaylist\app\obj\Debug\app.csproj.CoreCompileInputs.cache
+C:\project\SpotifyPlaylist\app\obj\Debug\app.csproj.CopyComplete
+C:\project\SpotifyPlaylist\app\obj\Debug\app.exe
+C:\project\SpotifyPlaylist\app\obj\Debug\app.pdb
+C:\project\SpotifyPlaylist\app\obj\Debug\app.csprojAssemblyReference.cache
+D:\Projects\SpotifyPlaylist - Windows Forms\app\obj\Debug\app.csprojAssemblyReference.cache
+D:\Projects\SpotifyPlaylist - Windows Forms\app\obj\Debug\app.FormAddPlaylists.resources
+D:\Projects\SpotifyPlaylist - Windows Forms\app\obj\Debug\app.FormMain.resources
+D:\Projects\SpotifyPlaylist - Windows Forms\app\obj\Debug\app.Properties.Resources.resources
+D:\Projects\SpotifyPlaylist - Windows Forms\app\obj\Debug\app.csproj.GenerateResource.cache
+D:\Projects\SpotifyPlaylist - Windows Forms\app\bin\Debug\app.exe.config
+D:\Projects\SpotifyPlaylist - Windows Forms\app\bin\Debug\app.exe
+D:\Projects\SpotifyPlaylist - Windows Forms\app\bin\Debug\app.pdb
+D:\Projects\SpotifyPlaylist - Windows Forms\app\bin\Debug\WebDriver.dll
+D:\Projects\SpotifyPlaylist - Windows Forms\app\bin\Debug\WebDriver.xml
+D:\Projects\SpotifyPlaylist - Windows Forms\app\obj\Debug\app.csproj.CopyComplete
+D:\Projects\SpotifyPlaylist - Windows Forms\app\obj\Debug\app.exe
+D:\Projects\SpotifyPlaylist - Windows Forms\app\obj\Debug\app.pdb
+C:\project\SpotifyPlaylist-master\app\obj\Debug\app.FormAddPlaylists.resources
+C:\project\SpotifyPlaylist-master\app\obj\Debug\app.FormMain.resources
+C:\project\SpotifyPlaylist-master\app\obj\Debug\app.Properties.Resources.resources
+C:\project\SpotifyPlaylist-master\app\obj\Debug\app.csproj.GenerateResource.cache
+C:\project\SpotifyPlaylist-master\app\obj\Debug\app.csprojAssemblyReference.cache
+C:\project\SpotifyPlaylist-master\app\bin\Debug\app.exe.config
+C:\project\SpotifyPlaylist-master\app\bin\Debug\app.exe
+C:\project\SpotifyPlaylist-master\app\bin\Debug\app.pdb
+C:\project\SpotifyPlaylist-master\app\bin\Debug\WebDriver.dll
+C:\project\SpotifyPlaylist-master\app\obj\Debug\app.csproj.CopyComplete
+C:\project\SpotifyPlaylist-master\app\obj\Debug\app.exe
+C:\project\SpotifyPlaylist-master\app\obj\Debug\app.pdb
