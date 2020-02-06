@@ -33,7 +33,7 @@ namespace app
                 playlist = new Playlist(Path, Url);
                 driver = new FirefoxDriver(BrowserSettings.FirefoxDriverService, BrowserSettings.FirefoxOptions());
 
-                playlist.GetPlaylist(chromeDriver);
+                //playlist.GetPlaylist(chromeDriver);
                 driver.Quit();
 
                 List<Music> MusicsToDownload = new List<Music>();
@@ -48,19 +48,19 @@ namespace app
                                                 .Select(System.IO.Path.GetFileName)
                                                 .ToArray();
 
-                foreach (Music music in playlist.Music)
-                {
-                    string track = music.Track + ".mp3";
-                    bool Contains = Tracks.Any(track.Contains);
+                //foreach (Music music in playlist.tempMusic)
+                //{
+                //    string track = music.Track + ".mp3";
+                //    bool Contains = Tracks.Any(track.Contains);
 
-                    if (!Contains)
-                    {
-                        MusicsToDownload.Add(music);
-                    }
-                }
+                //    if (!Contains)
+                //    {
+                //        MusicsToDownload.Add(music);
+                //    }
+                //}
                 if (MusicsToDownload.Count() > 0)
                 {
-                    playlist.Update();
+                    //playlist.Update();
                 }
 
                 using (StreamWriter sw = File.CreateText(playlist.PathUrlFile))

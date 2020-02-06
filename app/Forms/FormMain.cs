@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using app.Services;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Support.UI;
@@ -16,10 +17,11 @@ namespace app
     {
         public string Path = "D:\\Music";
         FolderBrowserDialog Dialog;
-        List<Playlist> Playlist = new List<Playlist>();
+        List<Playlist> playlists = new List<Playlist>();
         public FirefoxDriver driver;
         public ChromeDriver chromeDriver;
         private IWebElement WebElement;
+        private PlaylistService playlistService;
 
         public FormMain()
         {
@@ -29,10 +31,13 @@ namespace app
         private void FormMain_Load(object sender, EventArgs e)
         {
             ReadPath();
+
+            playlistService = new PlaylistService();
         }
-        private void ReadPath()
+        private List<Playlist> ReadPath()
         {
             DirectoryInfo directoryInfo = new DirectoryInfo(Path);
+            playlists = new List<Playlist>();
 
             if (directoryInfo.Exists)
             {
@@ -58,7 +63,7 @@ namespace app
                                     Name = dirSpot.Name,
                                     PathUrlFile = PathUrlFile
                                 };
-                                Playlist.Add(playlist);
+                                playlists.Add(playlist);
                             }
                             else
                             {
@@ -73,6 +78,7 @@ namespace app
             }
             else btnUpdatePlaylists.Enabled = false;
 
+            return playlists;
         }
 
         private void btnSelectPath_Click(object sender, EventArgs e)
@@ -87,19 +93,10 @@ namespace app
 
         private void btnUpdatePlaylists_Click(object sender, EventArgs e)
         {
-            Playlist.Clear();
-            ReadPath();
+            //var firefoxDriverService = FirefoxDriverService.CreateDefaultService();
+            //firefoxDriverService.HideCommandPromptWindow = true;
 
-            var firefoxDriverService = FirefoxDriverService.CreateDefaultService();
-            firefoxDriverService.HideCommandPromptWindow = true;
-
-
-            chromeDriver = new ChromeDriver(BrowserSettings.ChromeDriverService);
-            foreach (Playlist playlist in Playlist)
-            {
-                playlist.GetPlaylist(chromeDriver);
-            }
-            chromeDriver.Quit();
+            playlistService.GetPlaylistsData(ReadPath());
 
             try
             {
@@ -114,7 +111,7 @@ namespace app
 
             }
 
-            foreach (Playlist playlist in Playlist)
+            foreach (Playlist playlist in playlists)
             {
                 List<Music> MusicsToDownload = new List<Music>();
 
@@ -132,11 +129,11 @@ namespace app
                         MusicsToDownload.Add(music);
                     }
                 }
-                if (MusicsToDownload.Any())
-                {
-                    playlist.MusicToDownload = MusicsToDownload;
-                    playlist.Update();
-                }
+                //if (MusicsToDownload.Any())
+                //{
+                //    playlist.MusicToDownload = MusicsToDownload;
+                //    playlist.Update();
+                //}
 
                 //Songs to delete
                 foreach (string track in downloadedSongs)
