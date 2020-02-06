@@ -15,12 +15,11 @@ namespace app
 {
     public partial class FormMain : Form
     {
-        public string Path = "D:\\Music";
+        public string defaultPath = "D:\\Music";
         FolderBrowserDialog Dialog;
         List<Playlist> playlists = new List<Playlist>();
         public FirefoxDriver driver;
         public ChromeDriver chromeDriver;
-        private IWebElement WebElement;
         private PlaylistService playlistService;
 
         public FormMain()
@@ -30,13 +29,12 @@ namespace app
 
         private void FormMain_Load(object sender, EventArgs e)
         {
-            ReadPath();
-
             playlistService = new PlaylistService();
+            ReadPath();
         }
         private List<Playlist> ReadPath()
         {
-            DirectoryInfo directoryInfo = new DirectoryInfo(Path);
+            DirectoryInfo directoryInfo = new DirectoryInfo(defaultPath);
             playlists = new List<Playlist>();
 
             if (directoryInfo.Exists)
@@ -48,7 +46,7 @@ namespace app
                 {
                     foreach (var dirSpot in directorySpotify)
                     {
-                        string PathFolder = Path + "\\" + dirSpot.Name;
+                        string PathFolder = defaultPath + "\\" + dirSpot.Name;
                         string PathUrlFile = PathFolder + "\\url.txt";
 
                         if (File.Exists(PathUrlFile))
@@ -58,7 +56,7 @@ namespace app
                             if (pathUrlFile.Any())
                             {
                                 string Url = pathUrlFile.FirstOrDefault();
-                                Playlist playlist = new Playlist(Path, Url)
+                                Playlist playlist = new Playlist(defaultPath, Url)
                                 {
                                     Name = dirSpot.Name,
                                     PathUrlFile = PathUrlFile
@@ -86,7 +84,7 @@ namespace app
             Dialog = new FolderBrowserDialog();
             if (Dialog.ShowDialog() == DialogResult.OK)
             {
-                Path = Dialog.SelectedPath;
+                defaultPath = Dialog.SelectedPath;
                 ReadPath();
             }
         }
@@ -96,68 +94,79 @@ namespace app
             //var firefoxDriverService = FirefoxDriverService.CreateDefaultService();
             //firefoxDriverService.HideCommandPromptWindow = true;
 
-            playlistService.GetPlaylistsData(ReadPath());
+            playlists = playlistService.GetPlaylistsData(ReadPath());
+            UpdatePlaylist(playlists);
+        }
 
-            try
-            {
-                driver = new FirefoxDriver(BrowserSettings.FirefoxDriverService, BrowserSettings.FirefoxOptions());
-            }
-            catch (Exception ex)
-            {
-                if (ex.HResult == -2146233079)
-                {
-                    MessageBox.Show("Need to install Firefox");
-                }
-
-            }
-
-            foreach (Playlist playlist in playlists)
+        private void UpdatePlaylist(List<Playlist> playlists)
+        {
+            foreach (var playlist in playlists)
             {
                 List<Music> MusicsToDownload = new List<Music>();
 
-                string[] downloadedSongs = Directory.GetFiles(playlist.PathFolder, "*.mp3")
-                                                .Select(System.IO.Path.GetFileName)
-                                                .ToArray();
-
-                //Songs to download
-                foreach (Music music in playlist.Music)
-                {
-                    string track = music.Track + ".mp3";
-
-                    if (!downloadedSongs.Any(track.Contains))
-                    {
-                        MusicsToDownload.Add(music);
-                    }
-                }
-                //if (MusicsToDownload.Any())
-                //{
-                //    playlist.MusicToDownload = MusicsToDownload;
-                //    playlist.Update();
-                //}
-
-                //Songs to delete
-                foreach (string track in downloadedSongs)
-                {
-                    if (track.Contains(".mp3"))
-                    {
-                        string[] trackSplit = track.Split(new[] { ".mp3" }, StringSplitOptions.None);
-                        string Track = trackSplit[0];
-                        Music music = playlist.Music.Find(x => (x.Track == Track));
-
-                        if (music == null)
-                        {
-                            var test = (playlist.PathFolder + "\\" + Track + ".mp3");
-                            File.Delete(test);
-                        }
-                    }
-                }
+                string[] downloadedSongs = Directory.GetFiles(playlist.PathFolder, "*id=*").Select(Path.GetFileName).ToArray();
             }
-
-            MessageBox.Show("Your playlists are up to date");
         }
+
+        //try
+        //{
+        //    driver = new FirefoxDriver(BrowserSettings.FirefoxDriverService, BrowserSettings.FirefoxOptions());
+        //}
+        //catch (Exception ex)
+        //{
+        //    if (ex.HResult == -2146233079)
+        //    {
+        //        MessageBox.Show("Need to install Firefox browser");
+        //    }
+        //}
+
+        //foreach (Playlist playlist in playlists)
+        //{
+        //    List<Music> MusicsToDownload = new List<Music>();
+
+        //    string[] downloadedSongs = Directory.GetFiles(playlist.PathFolder, "*.mp3")
+        //                                    .Select(Path.GetFileName)
+        //                                    .ToArray();
+
+        //        //Songs to download
+        //        foreach (Music music in playlist.Music)
+        //        {
+        //            string track = music.Track + ".mp3";
+
+        //            if (!downloadedSongs.Any(track.Contains))
+        //            {
+        //                MusicsToDownload.Add(music);
+        //            }
+        //        }
+        //        //if (MusicsToDownload.Any())
+        //        //{
+        //        //    playlist.MusicToDownload = MusicsToDownload;
+        //        //    playlist.Update();
+        //        //}
+
+        //        //Songs to delete
+        //        foreach (string track in downloadedSongs)
+        //        {
+        //            if (track.Contains(".mp3"))
+        //            {
+        //                string[] trackSplit = track.Split(new[] { ".mp3" }, StringSplitOptions.None);
+        //                string Track = trackSplit[0];
+        //                Music music = playlist.Music.Find(x => (x.Track == Track));
+
+        //                if (music == null)
+        //                {
+        //                    var test = (playlist.PathFolder + "\\" + Track + ".mp3");
+        //                    File.Delete(test);
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    MessageBox.Show("Your playlists are up to date");
+        //}
         private void btnAddPlaylists_Click(object sender, EventArgs e)
         {
-            Form formAddPlaylists = new FormAddPlaylists(Path);
+            Form formAddPlaylists = new FormAddPlaylists(defaultPath);
             formAddPlaylists.Show();
         }
     }

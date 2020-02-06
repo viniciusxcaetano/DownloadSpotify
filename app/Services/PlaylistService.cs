@@ -24,15 +24,14 @@ namespace app.Services
 
 
 
-        public void GetPlaylistsData(List<Playlist> playlists)
+        public List<Playlist> GetPlaylistsData(List<Playlist> playlists)
         {
             chromeDriver = new ChromeDriver(BrowserSettings.ChromeDriverService);
-            //Order = 1;
-            //var tempMusic = new List<Music>();
-            //Music = new List<Music>();
+
             foreach (var playlist in playlists)
             {
                 int order = 1;
+                int nextElementCount = 0;
                 var listMusic = new List<Music>();
                 playlist.Music = new List<Music>();
                 IJavaScriptExecutor js = chromeDriver;
@@ -40,7 +39,14 @@ namespace app.Services
                 chromeDriver.Navigate().GoToUrl(playlist.Url);
 
                 WebElement = chromeDriver.FindElement(By.ClassName("mo-info-name"), 10);
-                playlist.Name = WebElement.Text;
+                string namePlaylist = WebElement.Text;
+                if (namePlaylist == "")
+                {
+                    WebElement = chromeDriver.FindElement(By.ClassName("TrackListHeader__entity-name"), 10);
+                    string[] trackSplit = WebElement.Text.Split(new[] { "\r\n" }, StringSplitOptions.None);
+                    namePlaylist = trackSplit[0];
+                }
+                playlist.Name = namePlaylist;
                 playlist.PathFolder = playlist.Device + "\\Spotify-" + playlist.Name;
                 playlist.PathUrlFile = playlist.PathFolder + "\\url.txt";
 
@@ -55,41 +61,50 @@ namespace app.Services
 
                 listMusic = FormatMusic(listMusic);
 
-                for (int i = 0; i < listMusic.Count; i++)
-                {
-                    Actions actions = new Actions(chromeDriver);
+                //for (int i = 0; i < listMusic.Count; i++)
+                //{
+                //    nextElementCount = listMusic.Count + 1 <= listMusic.Count ? i + 1 : i;
+                //    Actions actions = new Actions(chromeDriver);
 
-                    actions.ContextClick(tempSongs.ElementAt(i)).Perform(); // right click
-                    var checkIsMusic = chromeDriver.FindElements(By.ClassName("react-contextmenu-item"), 10);
+                //    actions.ContextClick(tempSongs.ElementAt(i)).Perform(); // right click
+                //    var checkIsMusic = chromeDriver.FindElements(By.ClassName("react-contextmenu-item"), 10);
 
-                    if (!checkIsMusic.Any(o => o.Text != "")) { actions.ContextClick(tempSongs.ElementAt(i)).Perform(); }
+                //    if (!checkIsMusic.Any(o => o.Text != "")) { actions.ContextClick(tempSongs.ElementAt(i)).Perform(); } //to fix a bug
 
-                    try
-                    {
-                        var music = checkIsMusic.Where(o => o.Text == "Copiar link da música" || o.Text == "Copy Song Link").FirstOrDefault();
-                        music.Click();
-                        var paste = System.Windows.Forms.Clipboard.GetText();
-                        string[] trackSplit = paste.Split(new[] { "/track/" }, StringSplitOptions.None);
-                        string id = trackSplit[1];
-                        js.ExecuteScript("window.scrollBy(0, 300)", ""); //scroll down
+                //    try
+                //    {
+                //        var music = checkIsMusic.Where(o => o.Text == "Copiar link da música" || o.Text == "Copy Song Link").FirstOrDefault();
+                //        music.Click();
+                //        var paste = System.Windows.Forms.Clipboard.GetText();
+                //        string[] trackSplit = paste.Split(new[] { "/track/" }, StringSplitOptions.None);
+                //        string id = trackSplit[1];
 
-                        //create music add to playlist
-                        playlist.Music.Add(new Music
-                        {
-                            Artist = listMusic[i].Artist,
-                            Name = listMusic[i].Name,
-                            Id = id,
-                            Track = order + ". " + listMusic[i].Artist + "-" + listMusic[i].Name + "    ID:" + id
-                        });
-                        order++;
-                    }
-                    catch (Exception ex)
-                    {
-                        js.ExecuteScript("window.scrollBy(0, 300)", ""); //scroll down
-                    }
-                }
+                //        //create music add to playlist
+                //        playlist.Music.Add(new Music
+                //        {
+                //            Artist = listMusic[i].Artist,
+                //            Name = listMusic[i].Name,
+                //            Id = id,
+                //            Track = order + ". " + listMusic[i].Artist + "-" + listMusic[i].Name + "    ID=" + id
+                //        });
+
+                //        if (tempSongs.ElementAt(nextElementCount).Location.Y > 200)
+                //        {
+                //            js.ExecuteScript($"window.scrollTo({0}, {tempSongs.ElementAt(nextElementCount).Location.Y - 200 })");
+                //        }
+                //        order++;
+                //    }
+                //    catch
+                //    {
+                //        if (tempSongs.ElementAt(nextElementCount).Location.Y > 200)
+                //        {
+                //            js.ExecuteScript($"window.scrollTo({0}, {tempSongs.ElementAt(nextElementCount).Location.Y - 200 })");
+                //        }
+                //    }
+                //}
             }
             chromeDriver.Quit();
+            return playlists;
         }
 
         public List<Music> FormatMusic(List<Music> listMusic)
