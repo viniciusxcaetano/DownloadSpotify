@@ -20,3 +20,11 @@ app/obj/project.assets.json
 app/Utils/BrowserSettings.cs
 
 app/Utils/WebDriverExtensions.cs
+
+app/obj/Debug/app.csproj.CopyComplete
+
+app/obj/Debug/app.FormAddPlaylists.resources
+
+app/obj/Debug/app.FormMain.resources
+
+app/obj/Debug/app.Properties.Resources.resources
