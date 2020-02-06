@@ -17,10 +17,6 @@ app/obj/Debug/app.csproj.FileListAbsolute.txt
 
 app/obj/project.assets.json
 
-app/Utils/BrowserSettings.cs
-
-app/Utils/WebDriverExtensions.cs
-
 app/obj/Debug/app.csproj.CopyComplete
 
 app/obj/Debug/app.FormAddPlaylists.resources

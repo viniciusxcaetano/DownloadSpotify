@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BrowserSettings.cs" />
     <Compile Include="Forms\FormAddPlaylists.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -57,13 +58,12 @@
     </Compile>
     <Compile Include="Forms\FormMain.Designer.cs" />
     <Compile Include="Services\BaseService.cs" />
-    <Compile Include="Utils\BrowserSettings.cs" />
     <Compile Include="Models\Music.cs" />
     <Compile Include="Models\Playlist.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\PlaylistService.cs" />
-    <Compile Include="Utils\WebDriverExtensions.cs" />
+    <Compile Include="WebDriverExtensions.cs" />
     <EmbeddedResource Include="Forms\FormAddPlaylists.resx" />
     <EmbeddedResource Include="Forms\FormMain.resx" />
     <EmbeddedResource Include="Properties\Resources.resx">
