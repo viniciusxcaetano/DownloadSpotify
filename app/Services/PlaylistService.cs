@@ -40,12 +40,14 @@ namespace app.Services
 
                 WebElement = chromeDriver.FindElement(By.ClassName("mo-info-name"), 10);
                 string namePlaylist = WebElement.Text;
-                if (namePlaylist == "")
+
+                if (namePlaylist == "") // for the windown when small
                 {
                     WebElement = chromeDriver.FindElement(By.ClassName("TrackListHeader__entity-name"), 10);
                     string[] trackSplit = WebElement.Text.Split(new[] { "\r\n" }, StringSplitOptions.None);
                     namePlaylist = trackSplit[0];
                 }
+
                 playlist.Name = namePlaylist;
                 playlist.PathFolder = playlist.Device + "\\Spotify-" + playlist.Name;
                 playlist.PathUrlFile = playlist.PathFolder + "\\url.txt";

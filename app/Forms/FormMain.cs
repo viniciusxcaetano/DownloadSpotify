@@ -30,7 +30,7 @@ namespace app
         private void FormMain_Load(object sender, EventArgs e)
         {
             playlistService = new PlaylistService();
-            ReadPath();
+            playlists = ReadPath();
         }
         private List<Playlist> ReadPath()
         {
@@ -104,7 +104,13 @@ namespace app
             {
                 List<Music> MusicsToDownload = new List<Music>();
 
-                string[] downloadedSongs = Directory.GetFiles(playlist.PathFolder, "*id=*").Select(Path.GetFileName).ToArray();
+                string[] songsInDirectory = Directory.GetFiles(playlist.PathFolder, "*id=*").Select(Path.GetFileName).ToArray();
+
+                var trackIds = songsInDirectory.Select(d => d.Split(new[] { "id=", ".mp3" }, StringSplitOptions.None)).Select(t => t[1]).ToList();
+                foreach (var songId in trackIds)
+                {
+
+                }
             }
         }
 
