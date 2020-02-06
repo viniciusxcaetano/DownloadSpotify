@@ -9,3 +9,14 @@ app.exe
 *.config
 !packages.config
 !app.config
+app/obj/app.csproj.nuget.dgspec.json
+
+app/obj/app.csproj.nuget.g.props
+
+app/obj/Debug/app.csproj.FileListAbsolute.txt
+
+app/obj/project.assets.json
+
+app/Utils/BrowserSettings.cs
+
+app/Utils/WebDriverExtensions.cs
