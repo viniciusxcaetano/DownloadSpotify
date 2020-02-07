@@ -1,14 +1,9 @@
 ﻿using app.Services;
-using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Firefox;
-using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace app
@@ -18,7 +13,6 @@ namespace app
         public string defaultPath = "D:\\Music";
         FolderBrowserDialog Dialog;
         List<Playlist> playlists = new List<Playlist>();
-        public FirefoxDriver driver;
         public ChromeDriver chromeDriver;
         private PlaylistService playlistService;
 
@@ -91,14 +85,13 @@ namespace app
 
         private void btnUpdatePlaylists_Click(object sender, EventArgs e)
         {
-            //var firefoxDriverService = FirefoxDriverService.CreateDefaultService();
-            //firefoxDriverService.HideCommandPromptWindow = true;
-
             chromeDriver = new ChromeDriver(BrowserSettings.ChromeDriverService);
             playlists = playlistService.GetUpdatedPlaylist(chromeDriver, ReadLocalPlaylists());
             playlistService.UpdatePlaylist(chromeDriver, playlists);
             playlistService.CheckIfDownloadedAll();
             playlistService.MoveSongs(playlists);
+            chromeDriver.Quit();
+            MessageBox.Show("Your playlists are up to date");
         }
 
         //private void UpdatePlaylist(List<Playlist> playlists)

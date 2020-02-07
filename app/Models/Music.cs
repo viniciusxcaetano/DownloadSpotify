@@ -12,5 +12,6 @@ namespace app
         public string Id { get; set; }
         public int alreadyTried { get; set; }
         public string PlaylistName { get; set; }
+        public int Order { get; set; }
     }
 }

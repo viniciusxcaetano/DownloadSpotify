@@ -23,7 +23,7 @@ namespace app.Services
         private IWebElement WebElement;
         //public FirefoxDriver driver { get; set; }
         public ChromeDriver chromeDriver { get; set; }
-        public string PathDownloadFolder { get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"); } }
+        public string DownloadDirectory { get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"); } }
 
 
 
@@ -92,6 +92,7 @@ namespace app.Services
                             Artist = listMusic[i].Artist,
                             Name = listMusic[i].Name,
                             Id = id,
+                            Order = order,
                             Track = order + ". " + listMusic[i].Artist + "-" + listMusic[i].Name + "    ID=" + id,
                             PlaylistName = playlistName
                         });
@@ -111,7 +112,6 @@ namespace app.Services
                     }
                 }
             }
-            //chromeDriver.Quit();
             return playlists;
         }
 
@@ -136,15 +136,30 @@ namespace app.Services
                 //songs to download
                 foreach (var music in playlist.Music)
                 {
-                    if (!ids.Any(o => o == music.Id))
+                    if (ids.Any(o => o == music.Id))
+                    {
+                        //update the order playlist
+
+                        var oldTrackOrder = songsInDirectory.Where(o => o.Contains(music.Id)).FirstOrDefault();
+                        string[] oldTrackOrderTemp = oldTrackOrder.Split('.');
+                        var oldOrder = int.Parse(oldTrackOrderTemp[0]);
+
+                        if (music.Order != oldOrder)
+                        {
+                            var newOrder = music.Order;
+                            var newTrackOrderTemp = oldTrackOrderTemp;
+                            newTrackOrderTemp[0] = newOrder.ToString();
+                            var newTrackOrder = String.Join(".", newTrackOrderTemp);
+                            File.Move(playlist.PathFolder + "\\" + oldTrackOrder, playlist.PathFolder + "\\" + newTrackOrder);
+                        }
+                    }
+                    else
                     {
                         playlist.MusicsToDownload.Add(music);
                         DownloadSong(chromeDriver, music);
                     }
                 }
             }
-
-
         }
 
         public List<Music> FormatMusic(List<Music> listMusic)
@@ -191,21 +206,10 @@ namespace app.Services
             return listMusic;
         }
 
-        //public void Update()
-        //{
-        //    foreach (Music music in MusicToDownload)
-        //    {
-        //        DownloadSong(music);
-
-        //    }
-        //    CheckIfDownloadedAll();
-        //    CheckIfSongIsEmpty();
-        //}
-
         public void CheckIfDownloadedAll()
         {
             //TODO: set a limit time
-            var tracks = Directory.GetFiles(PathDownloadFolder, "*.crdownload")
+            var tracks = Directory.GetFiles(DownloadDirectory, "*.crdownload")
                                                             .Select(Path.GetFileName)
                                                             .ToList();
             if (tracks.Any())
@@ -223,7 +227,7 @@ namespace app.Services
             {
                 foreach (var musicDownloaded in playlist.MusicsToDownload)
                 {
-                    var oldPath = string.Format("{0}\\{1}.mp3", PathDownloadFolder, musicDownloaded.Id);
+                    var oldPath = string.Format("{0}\\{1}.mp3", DownloadDirectory, musicDownloaded.Id);
 
                     if (File.Exists(oldPath))
                     {
@@ -274,65 +278,62 @@ namespace app.Services
 
         public void DownloadSong(ChromeDriver chromeDriver, Music music)
         {
-            if (music.alreadyTried < 2)
+            try
             {
-                string name = RemoveNonAlpha(music.Name).Replace(" ", "+");
-                string artist = RemoveNonAlpha(music.Artist).Replace(" ", "+");
-
-                string youtubeUrl = "https://www.youtube.com/results?search_query=" + artist + "+" + name + "+audio";
-
-                chromeDriver.Navigate().GoToUrl(youtubeUrl);
-
-                IReadOnlyCollection<IWebElement> webElements = chromeDriver.FindElements(By.Id("thumbnail"), 10);
-
-                foreach (var we in webElements)
+                if (music.alreadyTried < 2)
                 {
-                    youtubeUrl = we.GetAttribute("href");
-                    if (!youtubeUrl.Contains("www.googleadservices.com"))
+                    string name = RemoveNonAlpha(music.Name).Replace(" ", "+");
+                    string artist = RemoveNonAlpha(music.Artist).Replace(" ", "+");
+
+                    string youtubeUrl = "https://www.youtube.com/results?search_query=" + artist + "+" + name + "+audio";
+
+                    chromeDriver.Navigate().GoToUrl(youtubeUrl);
+
+                    IReadOnlyCollection<IWebElement> webElements = chromeDriver.FindElements(By.Id("thumbnail"), 10);
+
+                    foreach (var we in webElements)
                     {
-                        if (CheckDuration(chromeDriver))
+                        youtubeUrl = we.GetAttribute("href");
+                        if (!youtubeUrl.Contains("www.googleadservices.com"))
                         {
-                            var youtUrl = youtubeUrl.Replace("ube", "");
-
-                            chromeDriver.Navigate().GoToUrl(youtUrl);
-
-                            //need this If below, because sometimes cannot download some songs
-                            if (chromeDriver.FindElements(By.Name("settings_title"), 20).Count() > 0)
+                            if (CheckDuration(chromeDriver))
                             {
-                                FillTheFieldsAndDownload(chromeDriver, music);
+                                var youtUrl = youtubeUrl.Replace("ube", "");
+
+                                chromeDriver.Navigate().GoToUrl(youtUrl);
+
+                                //need this If below, because sometimes cannot download some songs
+                                if (chromeDriver.FindElements(By.Name("settings_title"), 20).Count() > 0)
+                                {
+                                    FillTheFieldsAndDownload(chromeDriver, music);
+                                }
                             }
+                            break;
                         }
-                        break;
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                if (ex.HResult == -2146233088)
+                    DownloadSong(chromeDriver, music);
             }
         }
 
         public bool CheckDuration(ChromeDriver chromeDriver)
         {
             //check if music duration is less than 9 minutes 
-            var temp = chromeDriver.FindElement(By.XPath("//ytd-video-renderer//ytd-thumbnail-overlay-time-status-renderer"), 50);
 
-            string[] time = temp.Text.Split(new[] { ":" }, StringSplitOptions.None);
+            var element = chromeDriver.FindElement(By.XPath("//ytd-video-renderer//ytd-thumbnail-overlay-time-status-renderer"), 50);
 
-            var canContinue = time.Length <= 2 ? true : false;
-            if (canContinue)
+            string[] time = element.Text.Split(new[] { ":" }, StringSplitOptions.None);
+
+            var result = time.Length <= 2 ? true : false;
+            if (result)
             {
-                canContinue = int.Parse(time[0]) < 9 ? true : false;
+                result = int.Parse(time[0]) < 9 ? true : false;
             }
-            return canContinue;
-
-            //DateTime time = new DateTime();
-            //try
-            //{
-            //    var durationTemp = string.Format("00:0" + chromeDriver.FindElements(By.XPath("//ytd-video-renderer//ytd-thumbnail-overlay-time-status-renderer"), 50).FirstOrDefault().Text);
-            //    time = DateTime.ParseExact(durationTemp, "HH:mm:ss", CultureInfo.InvariantCulture);
-            //}
-            //catch (Exception ex)
-            //{
-            //    if (!(ex.Message == "Cadeia de caracteres não foi reconhecida como DateTime válido." || ex.Message == "String was not recognized as a valid DateTime."))
-            //        GetDurationMusic(chromeDriver);
-            //}
+            return result;
         }
 
         public void FillTheFieldsAndDownload(ChromeDriver chromeDriver, Music music)
