@@ -19,9 +19,8 @@ namespace app
         public string Url { get; set; }
         public string Device { get; set; }
         public string PathFolder { get; set; }
-        public string PathDownloadFolder { get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"); } }
         public string PathUrlFile { get; set; }
-        public int Order { get; set; }
         public List<Music> Music { get; set; }
+        public List<Music> MusicsToDownload { get; set; }
     }
 }

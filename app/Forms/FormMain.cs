@@ -30,9 +30,9 @@ namespace app
         private void FormMain_Load(object sender, EventArgs e)
         {
             playlistService = new PlaylistService();
-            playlists = ReadPath();
+            playlists = ReadLocalPlaylists();
         }
-        private List<Playlist> ReadPath()
+        private List<Playlist> ReadLocalPlaylists()
         {
             DirectoryInfo directoryInfo = new DirectoryInfo(defaultPath);
             playlists = new List<Playlist>();
@@ -85,7 +85,7 @@ namespace app
             if (Dialog.ShowDialog() == DialogResult.OK)
             {
                 defaultPath = Dialog.SelectedPath;
-                ReadPath();
+                ReadLocalPlaylists();
             }
         }
 
@@ -94,25 +94,41 @@ namespace app
             //var firefoxDriverService = FirefoxDriverService.CreateDefaultService();
             //firefoxDriverService.HideCommandPromptWindow = true;
 
-            playlists = playlistService.GetPlaylistsData(ReadPath());
-            UpdatePlaylist(playlists);
+            chromeDriver = new ChromeDriver(BrowserSettings.ChromeDriverService);
+            playlists = playlistService.GetUpdatedPlaylist(chromeDriver, ReadLocalPlaylists());
+            playlistService.UpdatePlaylist(chromeDriver, playlists);
+            playlistService.CheckIfDownloadedAll();
+            playlistService.MoveSongs(playlists);
         }
 
-        private void UpdatePlaylist(List<Playlist> playlists)
-        {
-            foreach (var playlist in playlists)
-            {
-                List<Music> MusicsToDownload = new List<Music>();
+        //private void UpdatePlaylist(List<Playlist> playlists)
+        //{
+        //    foreach (var playlist in playlists)
+        //    {
+        //        List<Music> MusicsToDownload = new List<Music>();
 
-                string[] songsInDirectory = Directory.GetFiles(playlist.PathFolder, "*id=*").Select(Path.GetFileName).ToArray();
+        //        string[] songsInDirectory = Directory.GetFiles(playlist.PathFolder, "*id=*").Select(Path.GetFileName).ToArray();
 
-                var trackIds = songsInDirectory.Select(d => d.Split(new[] { "id=", ".mp3" }, StringSplitOptions.None)).Select(t => t[1]).ToList();
-                foreach (var songId in trackIds)
-                {
+        //        var ids = songsInDirectory.Select(d => d.Split(new[] { "id=", ".mp3" }, StringSplitOptions.None)).Select(t => t[1]).ToList();
 
-                }
-            }
-        }
+        //        //songs to delete
+        //        foreach (var id in ids)
+        //        {
+        //            if (!playlist.Music.Any(o => o.Id == id))
+        //            {
+        //                //delete song with id = id;
+        //            }
+        //        }
+        //        //songs to download
+        //        foreach (var music in playlist.Music)
+        //        {
+        //            if (!ids.Any(o => o == music.Id))
+        //            {
+        //                playlistService.DownloadSong(music);
+        //            }
+        //        }
+        //    }
+        //}
 
         //try
         //{

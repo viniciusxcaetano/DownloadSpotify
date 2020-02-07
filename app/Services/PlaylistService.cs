@@ -16,17 +16,21 @@ namespace app.Services
 {
     public class PlaylistService
     {
-        public PlaylistService() { }
+        public PlaylistService()
+        {
+        }
 
         private IWebElement WebElement;
-        public FirefoxDriver driver { get; set; }
+        //public FirefoxDriver driver { get; set; }
         public ChromeDriver chromeDriver { get; set; }
+        public string PathDownloadFolder { get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"); } }
 
 
 
-        public List<Playlist> GetPlaylistsData(List<Playlist> playlists)
+
+        public List<Playlist> GetUpdatedPlaylist(ChromeDriver chromeDriver, List<Playlist> playlists)
         {
-            chromeDriver = new ChromeDriver(BrowserSettings.ChromeDriverService);
+            //chromeDriver = new ChromeDriver(BrowserSettings.ChromeDriverService);
 
             foreach (var playlist in playlists)
             {
@@ -39,16 +43,16 @@ namespace app.Services
                 chromeDriver.Navigate().GoToUrl(playlist.Url);
 
                 WebElement = chromeDriver.FindElement(By.ClassName("mo-info-name"), 10);
-                string namePlaylist = WebElement.Text;
+                string playlistName = WebElement.Text;
 
-                if (namePlaylist == "") // for the windown when small
+                if (playlistName == "") // for the windown when small
                 {
                     WebElement = chromeDriver.FindElement(By.ClassName("TrackListHeader__entity-name"), 10);
                     string[] trackSplit = WebElement.Text.Split(new[] { "\r\n" }, StringSplitOptions.None);
-                    namePlaylist = trackSplit[0];
+                    playlistName = trackSplit[0];
                 }
 
-                playlist.Name = namePlaylist;
+                playlist.Name = playlistName;
                 playlist.PathFolder = playlist.Device + "\\Spotify-" + playlist.Name;
                 playlist.PathUrlFile = playlist.PathFolder + "\\url.txt";
 
@@ -63,50 +67,84 @@ namespace app.Services
 
                 listMusic = FormatMusic(listMusic);
 
+                for (int i = 0; i < 7; i++) // for test
                 //for (int i = 0; i < listMusic.Count; i++)
-                //{
-                //    nextElementCount = listMusic.Count + 1 <= listMusic.Count ? i + 1 : i;
-                //    Actions actions = new Actions(chromeDriver);
+                {
+                    nextElementCount = listMusic.Count + 1 <= listMusic.Count ? i + 1 : i;
+                    Actions actions = new Actions(chromeDriver);
 
-                //    actions.ContextClick(tempSongs.ElementAt(i)).Perform(); // right click
-                //    var checkIsMusic = chromeDriver.FindElements(By.ClassName("react-contextmenu-item"), 10);
+                    actions.ContextClick(tempSongs.ElementAt(i)).Perform(); // right click
+                    var checkIsMusic = chromeDriver.FindElements(By.ClassName("react-contextmenu-item"), 10);
 
-                //    if (!checkIsMusic.Any(o => o.Text != "")) { actions.ContextClick(tempSongs.ElementAt(i)).Perform(); } //to fix a bug
+                    if (!checkIsMusic.Any(o => o.Text != "")) { actions.ContextClick(tempSongs.ElementAt(i)).Perform(); } //to fix a bug
 
-                //    try
-                //    {
-                //        var music = checkIsMusic.Where(o => o.Text == "Copiar link da música" || o.Text == "Copy Song Link").FirstOrDefault();
-                //        music.Click();
-                //        var paste = System.Windows.Forms.Clipboard.GetText();
-                //        string[] trackSplit = paste.Split(new[] { "/track/" }, StringSplitOptions.None);
-                //        string id = trackSplit[1];
+                    try
+                    {
+                        var music = checkIsMusic.Where(o => o.Text == "Copiar link da música" || o.Text == "Copy Song Link").FirstOrDefault();
+                        music.Click();
+                        var paste = System.Windows.Forms.Clipboard.GetText();
+                        string[] trackSplit = paste.Split(new[] { "/track/" }, StringSplitOptions.None);
+                        string id = trackSplit[1];
 
-                //        //create music add to playlist
-                //        playlist.Music.Add(new Music
-                //        {
-                //            Artist = listMusic[i].Artist,
-                //            Name = listMusic[i].Name,
-                //            Id = id,
-                //            Track = order + ". " + listMusic[i].Artist + "-" + listMusic[i].Name + "    ID=" + id
-                //        });
+                        //create music add to playlist
+                        playlist.Music.Add(new Music
+                        {
+                            Artist = listMusic[i].Artist,
+                            Name = listMusic[i].Name,
+                            Id = id,
+                            Track = order + ". " + listMusic[i].Artist + "-" + listMusic[i].Name + "    ID=" + id,
+                            PlaylistName = playlistName
+                        });
 
-                //        if (tempSongs.ElementAt(nextElementCount).Location.Y > 200)
-                //        {
-                //            js.ExecuteScript($"window.scrollTo({0}, {tempSongs.ElementAt(nextElementCount).Location.Y - 200 })");
-                //        }
-                //        order++;
-                //    }
-                //    catch
-                //    {
-                //        if (tempSongs.ElementAt(nextElementCount).Location.Y > 200)
-                //        {
-                //            js.ExecuteScript($"window.scrollTo({0}, {tempSongs.ElementAt(nextElementCount).Location.Y - 200 })");
-                //        }
-                //    }
-                //}
+                        if (tempSongs.ElementAt(nextElementCount).Location.Y > 200)
+                        {
+                            js.ExecuteScript($"window.scrollTo({0}, {tempSongs.ElementAt(nextElementCount).Location.Y - 200 })");
+                        }
+                        order++;
+                    }
+                    catch
+                    {
+                        if (tempSongs.ElementAt(nextElementCount).Location.Y > 200)
+                        {
+                            js.ExecuteScript($"window.scrollTo({0}, {tempSongs.ElementAt(nextElementCount).Location.Y - 200 })");
+                        }
+                    }
+                }
             }
-            chromeDriver.Quit();
+            //chromeDriver.Quit();
             return playlists;
+        }
+
+        public void UpdatePlaylist(ChromeDriver chromeDriver, List<Playlist> playlists)
+        {
+            foreach (var playlist in playlists)
+            {
+                playlist.MusicsToDownload = new List<Music>();
+
+                string[] songsInDirectory = Directory.GetFiles(playlist.PathFolder, "*id=*").Select(Path.GetFileName).ToArray();
+
+                var ids = songsInDirectory.Select(d => d.Split(new[] { "id=", ".mp3" }, StringSplitOptions.None)).Select(t => t[1]).ToList();
+
+                //songs to delete
+                foreach (var id in ids)
+                {
+                    if (!playlist.Music.Any(o => o.Id == id))
+                    {
+                        //delete song with id = id;
+                    }
+                }
+                //songs to download
+                foreach (var music in playlist.Music)
+                {
+                    if (!ids.Any(o => o == music.Id))
+                    {
+                        playlist.MusicsToDownload.Add(music);
+                        DownloadSong(chromeDriver, music);
+                    }
+                }
+            }
+
+
         }
 
         public List<Music> FormatMusic(List<Music> listMusic)
@@ -164,204 +202,215 @@ namespace app.Services
         //    CheckIfSongIsEmpty();
         //}
 
-        //public void CheckIfDownloadedAll()
-        //{
-        //    var tracks = Directory.GetFiles(PathDownloadFolder, "*.part")
-        //                                                    .Select(Path.GetFileName)
-        //                                                    .ToList();
-        //    if (tracks.Any())
-        //    {
-        //        Thread.Sleep(2000);
-        //        CheckIfDownloadedAll();
-        //    }
-        //}
+        public void CheckIfDownloadedAll()
+        {
+            //TODO: set a limit time
+            var tracks = Directory.GetFiles(PathDownloadFolder, "*.crdownload")
+                                                            .Select(Path.GetFileName)
+                                                            .ToList();
+            if (tracks.Any())
+            {
+                Thread.Sleep(2000);
+                CheckIfDownloadedAll();
+            }
+        }
 
-        //public void CheckIfSongIsEmpty()
-        //{
-        //    foreach (var musicToDownload in MusicToDownload)
-        //    {
-        //        //var oldPath = string.Format("{0}\\{1}.mp3", PathDownloadFolder, Utils.FormatTrackName(musicToDownload.Track));
+        public void MoveSongs(List<Playlist> playlists)
+        {
+            //var oldPath = string.Format("{0}\\{1}.mp3", PathDownloadFolder, Utils.FormatTrackName(musicToDownload.Track));
 
-        //        if (File.Exists(oldPath))
-        //        {
-        //            FileInfo fileInfo = new FileInfo(oldPath);
+            foreach (var playlist in playlists)
+            {
+                foreach (var musicDownloaded in playlist.MusicsToDownload)
+                {
+                    var oldPath = string.Format("{0}\\{1}.mp3", PathDownloadFolder, musicDownloaded.Id);
 
-        //            if (fileInfo.Exists)
-        //            {
-        //                var size = fileInfo.Length;
+                    if (File.Exists(oldPath))
+                    {
+                        FileInfo fileInfo = new FileInfo(oldPath);
 
-        //                if (size == 0)
-        //                {
-        //                    File.Delete(oldPath);
-        //                    var splitted = oldPath.Split(new string[] { "\\", ".mp3" }, StringSplitOptions.None);
-        //                    oldPath = splitted[splitted.Count() - 2];
+                        if (fileInfo.Exists)
+                        {
+                            var size = fileInfo.Length;
 
-        //                    var music = MusicToDownload.Find(o => Utils.FormatTrackName(o.Track) == oldPath);
-        //                    if (music != null)
-        //                    {
-        //                        DownloadSong(music);
-        //                        CheckIfDownloadedAll();
+                            if (size == 0)
+                            {
+                                File.Delete(oldPath);
+                                //var splitted = oldPath.Split(new string[] { "\\", ".mp3" }, StringSplitOptions.None);
+                                //oldPath = splitted[splitted.Count() - 2];
 
-        //                        fileInfo = new FileInfo(oldPath);
-        //                        if (fileInfo.Exists)
-        //                            size = fileInfo.Length;
+                                //var music = MusicToDownload.Find(o => Utils.FormatTrackName(o.Track) == oldPath);
+                                //if (music != null)
+                                //{
+                                //    DownloadSong(music);
+                                //    CheckIfDownloadedAll();
 
-        //                        if (size == 0)
-        //                        {
-        //                            music.alreadyTried++;
-        //                            CheckIfSongIsEmpty();
-        //                        }
-        //                    }
-        //                }
+                                //    fileInfo = new FileInfo(oldPath);
+                                //    if (fileInfo.Exists)
+                                //        size = fileInfo.Length;
 
-        //                // move file to the right folder
-        //                //var newPath = string.Format("{0}\\{1}.mp3", PathFolder, Utils.FormatTrackName(musicToDownload.Track));
-        //                try
-        //                {
-        //                    File.Move(oldPath, newPath);
-        //                }
-        //                catch
-        //                {
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
+                                //    if (size == 0)
+                                //    {
+                                //        music.alreadyTried++;
+                                //        MoveSongs();
+                                //    }
+                                //}
+                            }
 
-        //public void DownloadSong(Music music)
-        //{
-        //    if (music.alreadyTried < attempts)
-        //    {
-        //        string name = music.Name.Replace(" ", "+");
-        //        string artist = music.Artist.Replace(" ", "+");
+                            // move file to the right folder
+                            var newPath = string.Format("{0}\\{1}.mp3", playlist.PathFolder, musicDownloaded.Track);
+                            try
+                            {
+                                File.Move(oldPath, newPath);
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-        //        string youtubeUrl = "https://www.youtube.com/results?search_query=" + artist + "+" + name + "+audio";
+        public void DownloadSong(ChromeDriver chromeDriver, Music music)
+        {
+            if (music.alreadyTried < 2)
+            {
+                string name = RemoveNonAlpha(music.Name).Replace(" ", "+");
+                string artist = RemoveNonAlpha(music.Artist).Replace(" ", "+");
 
-        //        driver.Navigate().GoToUrl(youtubeUrl);
+                string youtubeUrl = "https://www.youtube.com/results?search_query=" + artist + "+" + name + "+audio";
 
-        //        IReadOnlyCollection<IWebElement> webElements = driver.FindElements(By.Id("thumbnail"), 10);
+                chromeDriver.Navigate().GoToUrl(youtubeUrl);
 
-        //        foreach (var we in webElements)
-        //        {
-        //            youtubeUrl = we.GetAttribute("href");
-        //            if (!youtubeUrl.Contains("www.googleadservices.com"))
-        //            {
-        //                GetDurationMusic(music);
-        //                break;
-        //            }
-        //        }
+                IReadOnlyCollection<IWebElement> webElements = chromeDriver.FindElements(By.Id("thumbnail"), 10);
 
-        //        if (music.Duration.Minute > 0)
-        //        {
-        //            var youtUrl = youtubeUrl.Replace("ube", "");
+                foreach (var we in webElements)
+                {
+                    youtubeUrl = we.GetAttribute("href");
+                    if (!youtubeUrl.Contains("www.googleadservices.com"))
+                    {
+                        if (CheckDuration(chromeDriver))
+                        {
+                            var youtUrl = youtubeUrl.Replace("ube", "");
 
-        //            driver.Navigate().GoToUrl(youtUrl);
+                            chromeDriver.Navigate().GoToUrl(youtUrl);
 
-        //            //need this below, because sometimes cannot download some songs
-        //            if (driver.FindElements(By.Name("settings_title"), 20).Count() > 0)
-        //            {
-        //                FillTheFieldsAndDownload(music);
-        //            }
-        //        }
-        //    }
-        //}
+                            //need this If below, because sometimes cannot download some songs
+                            if (chromeDriver.FindElements(By.Name("settings_title"), 20).Count() > 0)
+                            {
+                                FillTheFieldsAndDownload(chromeDriver, music);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
 
-        //public void GetDurationMusic(Music music)
-        //{
-        //    try
-        //    {
-        //        var duration = string.Format("00:0" + driver.FindElements(By.XPath("//ytd-video-renderer//ytd-thumbnail-overlay-time-status-renderer"), 50).FirstOrDefault().Text);
-        //        music.Duration = DateTime.ParseExact(duration, "HH:mm:ss", CultureInfo.InvariantCulture);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        if (!(ex.Message == "Cadeia de caracteres não foi reconhecida como DateTime válido." || ex.Message == "String was not recognized as a valid DateTime."))
-        //            GetDurationMusic(music);
-        //    }
-        //}
+        public bool CheckDuration(ChromeDriver chromeDriver)
+        {
+            //check if music duration is less than 9 minutes 
+            var temp = chromeDriver.FindElement(By.XPath("//ytd-video-renderer//ytd-thumbnail-overlay-time-status-renderer"), 50);
 
-        //public void FillTheFieldsAndDownload(Music music)
-        //{
-        //    try
-        //    {
-        //        WebElement = driver.FindElement(By.Name("settings_title"), 10);
-        //        WebElement.SendKeys(Keys.Control + "a");
-        //        WebElement.SendKeys(Keys.Delete);
+            string[] time = temp.Text.Split(new[] { ":" }, StringSplitOptions.None);
 
-        //        if (music.Artist == "")
-        //        {
-        //            WebElement.SendKeys(music.Name);
-        //            music.Track = music.Name;
-        //        }
-        //        else
-        //        {
-        //            WebElement.SendKeys(music.Artist + "-" + music.Name);
-        //            music.Track = music.Artist + "-" + music.Name;
-        //        }
+            var canContinue = time.Length <= 2 ? true : false;
+            if (canContinue)
+            {
+                canContinue = int.Parse(time[0]) < 9 ? true : false;
+            }
+            return canContinue;
 
-        //        WebElement = driver.FindElement(By.Name("settings_artist"), 10);
-        //        WebElement.SendKeys(Keys.Control + "a");
-        //        WebElement.SendKeys(Keys.Delete);
-        //        WebElement.SendKeys("Spotify-" + this.Name);
+            //DateTime time = new DateTime();
+            //try
+            //{
+            //    var durationTemp = string.Format("00:0" + chromeDriver.FindElements(By.XPath("//ytd-video-renderer//ytd-thumbnail-overlay-time-status-renderer"), 50).FirstOrDefault().Text);
+            //    time = DateTime.ParseExact(durationTemp, "HH:mm:ss", CultureInfo.InvariantCulture);
+            //}
+            //catch (Exception ex)
+            //{
+            //    if (!(ex.Message == "Cadeia de caracteres não foi reconhecida como DateTime válido." || ex.Message == "String was not recognized as a valid DateTime."))
+            //        GetDurationMusic(chromeDriver);
+            //}
+        }
 
-        //        WebElement = driver.FindElement(By.ClassName("recorder-action"), 10);
-        //        WebElement.Click();
+        public void FillTheFieldsAndDownload(ChromeDriver chromeDriver, Music music)
+        {
+            try
+            {
+                WebElement = chromeDriver.FindElement(By.Name("settings_title"), 10);
+                WebElement.SendKeys(Keys.Control + "a");
+                WebElement.SendKeys(Keys.Delete);
 
-        //        CheckIfDownloadHasStarted(music);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        DownloadSong(music);
-        //    }
-        //}
-        //public void CheckIfDownloadHasStarted(Music music)
-        //{
-        //    if (music.alreadyTried < attempts)
-        //    {
-        //        //string track = Utils.FormatTrackName(music.Track);
+                WebElement.SendKeys(music.Id);
 
-        //        if (driver.FindElements(By.ClassName("btn-warning"), 20).Count() > 0)
-        //        {
-        //            WebElement = driver.FindElement(By.ClassName("btn-recorder"), 10);
-        //            if (WebElement.Text == "Repetir gravação MP3")
-        //            {
-        //                //se aparecer "Repetir gravacao" recarregar a pagina e tentar denovo.
-        //                music.alreadyTried++;
-        //                DownloadSong(music);
+                WebElement = chromeDriver.FindElement(By.Name("settings_artist"), 10);
+                WebElement.SendKeys(Keys.Control + "a");
+                WebElement.SendKeys(Keys.Delete);
+                WebElement.SendKeys("Spotify-" + music.PlaylistName);
 
-        //            }
-        //        }
+                WebElement = chromeDriver.FindElement(By.ClassName("recorder-action"), 10);
+                WebElement.Click();
 
-        //        var pathFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+                CheckIfDownloadHasStarted(chromeDriver, music);
+            }
+            catch (Exception)
+            {
+                DownloadSong(chromeDriver, music);
+            }
+        }
+        public void CheckIfDownloadHasStarted(ChromeDriver chromeDriver, Music music)
+        {
+            if (music.alreadyTried < 2)
+            {
+                //string track = Utils.FormatTrackName(music.Track);
 
-        //        var Tracks = Directory.GetFiles(pathFolder, "*" + track + "*").
-        //                   Where(s => s.EndsWith(".mp3") || s.EndsWith(".part")).
-        //                   Select(System.IO.Path.GetFileName).ToList();
+                if (chromeDriver.FindElements(By.ClassName("btn-warning"), 20).Count() > 0)
+                {
+                    WebElement = chromeDriver.FindElement(By.ClassName("btn-recorder"), 10);
+                    if (WebElement.Text == "Repetir gravação MP3")
+                    {
+                        //se aparecer "Repetir gravacao" recarregar a pagina e tentar denovo.
+                        music.alreadyTried++;
+                        DownloadSong(chromeDriver, music);
 
-        //        if (!Tracks.Any())
-        //        {
-        //            Thread.Sleep(1000);
-        //            CheckIfDownloadHasStarted(music);
-        //        }
-        //    }
-        //}
+                    }
+                }
 
-        //public static string RemoveNonAlpha(string str)
-        //{
-        //    string comAcentos = "ÄÅÁÂÀÃäáâàãÉÊËÈéêëèÍÎÏÌíîïìÖÓÔÒÕöóôòõÜÚÛüúûùÇç";
-        //    string semAcentos = "AAAAAAaaaaaEEEEeeeeIIIIiiiiOOOOOoooooUUUuuuuCc";
+                var pathFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
 
-        //    for (int i = 0; i < comAcentos.Length; i++)
-        //    {
-        //        str = str.Replace(comAcentos[i].ToString(), semAcentos[i].ToString());
-        //    }
+                //var Tracks = Directory.GetFiles(pathFolder, "*" + track + "*").
+                //           Where(s => s.EndsWith(".mp3") || s.EndsWith(".part")).
+                //           Select(System.IO.Path.GetFileName).ToList();
+                var Tracks = Directory.GetFiles(pathFolder, "*" + music.Id + "*").
+                           Where(s => s.EndsWith(".mp3") || s.EndsWith(".crdownload")).
+                           Select(Path.GetFileName).ToList();
 
-        //    str = Regex.Replace(str, "[^a-zA-Z0-9 ]", "");
-        //    RegexOptions options = RegexOptions.None;
-        //    Regex regex = new Regex("[ ]{2,}", options);
-        //    str = regex.Replace(str, " ");
+                if (!Tracks.Any())
+                {
+                    Thread.Sleep(1000);
+                    CheckIfDownloadHasStarted(chromeDriver, music);
+                }
+            }
+        }
 
-        //    return str;
-        //}
+        public static string RemoveNonAlpha(string str)
+        {
+            string comAcentos = "ÄÅÁÂÀÃäáâàãÉÊËÈéêëèÍÎÏÌíîïìÖÓÔÒÕöóôòõÜÚÛüúûùÇç";
+            string semAcentos = "AAAAAAaaaaaEEEEeeeeIIIIiiiiOOOOOoooooUUUuuuuCc";
+
+            for (int i = 0; i < comAcentos.Length; i++)
+            {
+                str = str.Replace(comAcentos[i].ToString(), semAcentos[i].ToString());
+            }
+
+            str = Regex.Replace(str, "[^a-zA-Z0-9 ]", "");
+            RegexOptions options = RegexOptions.None;
+            Regex regex = new Regex("[ ]{2,}", options);
+            str = regex.Replace(str, " ");
+
+            return str;
+        }
     }
 }
