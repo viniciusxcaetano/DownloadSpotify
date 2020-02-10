@@ -67,8 +67,8 @@ namespace app.Services
 
                 listMusic = FormatMusic(listMusic);
 
-                for (int i = 0; i < 7; i++) // for test
-                //for (int i = 0; i < listMusic.Count; i++)
+                //for (int i = 0; i < 7; i++) // for test
+                for (int i = 0; i < listMusic.Count; i++)
                 {
                     nextElementCount = listMusic.Count + 1 <= listMusic.Count ? i + 1 : i;
                     Actions actions = new Actions(chromeDriver);
